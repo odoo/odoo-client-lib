@@ -8,8 +8,6 @@ services in an user-friendly way. It was created for those that doesn't want to 
 on the bare metal. It handles XML-RPC as well as JSON-RPC protocol and provides a bunch of syntaxic
 sugar to make things a lot easier.
 
-The OpenERP Client Library is officially supported by OpenERP SA.
-
 Guide
 -----
 
@@ -67,35 +65,8 @@ Here are also some considerations about coding using the OpenERP Client Library:
 Compatibility
 -------------
 
-- 1.0
+- XML-RPC: OpenERP version 6.1 and superior
 
- - XML-RPC: OpenERP version 6.1 and superior
-
-- 1.1
-
- - XML-RPC: OpenERP version 6.1 and superior
-
- - JSON-RPC: OpenERP version 8.0 (upcoming) and superior
-
-
-Changelog
----------
-
-- 1.1.1:
-
- - Updated documentation
-
-- 1.1.0:
-
- - Added JsonRPC support
-
-- 1.0.4:
-
- - Removed netrpc handler
- - Added call to model methods with kwargs
-
-- 1.0.2:
-
- - added dates helper
+- JSON-RPC: OpenERP version 8.0 (upcoming) and superior
 
 
