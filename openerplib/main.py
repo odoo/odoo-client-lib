@@ -39,10 +39,10 @@ import sys
 
 if sys.version_info >= (3, 0, 0):
     from urllib.request import Request, urlopen
-    import xmlrpc as xmlrpclib
+    from xmlrpc.client import ServerProxy
 else:
     from urllib2 import Request, urlopen
-    import xmlrpclib
+    from xmlrpclib import ServerProxy
 import logging
 import json
 import random
@@ -85,7 +85,7 @@ class XmlRPCConnector(Connector):
 
     def send(self, service_name, method, *args):
         url = '%s/%s' % (self.url, service_name)
-        service = xmlrpclib.ServerProxy(url)
+        service = ServerProxy(url)
         return getattr(service, method)(*args)
 
 class XmlRPCSConnector(XmlRPCConnector):
