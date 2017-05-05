@@ -35,10 +35,16 @@ Home page: http://pypi.python.org/pypi/openerp-client-lib
 Code repository: https://code.launchpad.net/~niv-openerp/openerp-client-lib/trunk
 """
 
-import xmlrpclib
+import sys
+
+if sys.version_info >= (3, 0, 0):
+    from urllib.request import Request, urlopen
+    from xmlrpc.client import ServerProxy
+else:
+    from urllib2 import Request, urlopen
+    from xmlrpclib import ServerProxy
 import logging
 import json
-import urllib2
 import random
 
 _logger = logging.getLogger(__name__)
@@ -79,7 +85,7 @@ class XmlRPCConnector(Connector):
 
     def send(self, service_name, method, *args):
         url = '%s/%s' % (self.url, service_name)
-        service = xmlrpclib.ServerProxy(url)
+        service = ServerProxy(url)
         return getattr(service, method)(*args)
 
 class XmlRPCSConnector(XmlRPCConnector):
@@ -107,10 +113,10 @@ def json_rpc(url, fct_name, params):
         "params": params,
         "id": random.randint(0, 1000000000),
     }
-    req = urllib2.Request(url=url, data=json.dumps(data), headers={
+    req = Request(url=url, data=json.dumps(data), headers={
         "Content-Type":"application/json",
     })
-    result = urllib2.urlopen(req)
+    result = urlopen(req)
     result = json.load(result)
     if result.get("error", None):
         raise JsonRPCException(result["error"])
