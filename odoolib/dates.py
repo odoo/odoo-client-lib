@@ -3,7 +3,8 @@
 #
 # Copyright (C) Stephane Wirtel
 # Copyright (C) 2011 Nicolas Vanhoren
-# Copyright (C) 2011 OpenERP s.a. (<http://openerp.com>).
+# Copyright (C) 2011 OpenERP s.a. (<http://openerp.com>)
+# Copyright (C) 2018 Odoo s.a. (<http://odoo.com>).
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -38,11 +39,11 @@ DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
 
 def str_to_datetime(str):
     """
-    Converts a string to a datetime object using OpenERP's
+    Converts a string to a datetime object using Odoo's
     datetime string format (exemple: '2011-12-01 15:12:35').
     
     No timezone information is added, the datetime is a naive instance, but
-    according to OpenERP 6.1 specification the timezone is always UTC.
+    according to Odoo 9.0 specification the timezone is always UTC.
     """
     if not str:
         return str
@@ -50,7 +51,7 @@ def str_to_datetime(str):
 
 def str_to_date(str):
     """
-    Converts a string to a date object using OpenERP's
+    Converts a string to a date object using Odoo's
     date string format (exemple: '2011-12-01').
     """
     if not str:
@@ -59,7 +60,7 @@ def str_to_date(str):
 
 def str_to_time(str):
     """
-    Converts a string to a time object using OpenERP's
+    Converts a string to a time object using Odoo's
     time string format (exemple: '15:12:35').
     """
     if not str:
@@ -68,7 +69,7 @@ def str_to_time(str):
 
 def datetime_to_str(obj):
     """
-    Converts a datetime object to a string using OpenERP's
+    Converts a datetime object to a string using Odoo's
     datetime string format (exemple: '2011-12-01 15:12:35').
     
     The datetime instance should not have an attached timezone and be in UTC.
@@ -79,7 +80,7 @@ def datetime_to_str(obj):
 
 def date_to_str(obj):
     """
-    Converts a date object to a string using OpenERP's
+    Converts a date object to a string using Odoo's
     date string format (exemple: '2011-12-01').
     """
     if not obj:
@@ -88,10 +89,9 @@ def date_to_str(obj):
 
 def time_to_str(obj):
     """
-    Converts a time object to a string using OpenERP's
+    Converts a time object to a string using Odoo's
     time string format (exemple: '15:12:35').
     """
     if not obj:
         return False
     return obj.strftime(DEFAULT_SERVER_TIME_FORMAT)
-

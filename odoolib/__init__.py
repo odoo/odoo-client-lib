@@ -3,7 +3,8 @@
 #
 # Copyright (C) Stephane Wirtel
 # Copyright (C) 2011 Nicolas Vanhoren
-# Copyright (C) 2011 OpenERP s.a. (<http://openerp.com>).
+# Copyright (C) 2011 OpenERP s.a. (<http://openerp.com>)
+# Copyright (C) 2018 Odoo s.a. (<http://odoo.com>).
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -29,4 +30,3 @@
 ##############################################################################
 
 from .main import *
-

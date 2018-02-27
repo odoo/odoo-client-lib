@@ -3,7 +3,8 @@
 #
 # Copyright (C) Stephane Wirtel
 # Copyright (C) 2011 Nicolas Vanhoren
-# Copyright (C) 2011 OpenERP s.a. (<http://openerp.com>).
+# Copyright (C) 2011 OpenERP s.a. (<http://openerp.com>)
+# Copyright (C) 2018 Odoo s.a. (<http://odoo.com>).
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -29,19 +30,17 @@
 ##############################################################################
 
 """
-OpenERP Client Library
+Odoo Client Library
 
-Home page: http://pypi.python.org/pypi/openerp-client-lib
-Code repository: https://code.launchpad.net/~niv-openerp/openerp-client-lib/trunk
+Home page: http://pypi.python.org/pypi/odoo-client-lib
+Code repository: https://github.com/odoo/odoo-client-lib
 """
 
 import sys
-
+import requests
 if sys.version_info >= (3, 0, 0):
-    from urllib.request import Request, urlopen
     from xmlrpc.client import ServerProxy
 else:
-    from urllib2 import Request, urlopen
     from xmlrpclib import ServerProxy
 import logging
 import json
@@ -54,7 +53,7 @@ def _getChildLogger(logger, subname):
 
 class Connector(object):
     """
-    The base abstract class representing a connection to an OpenERP Server.
+    The base abstract class representing a connection to an Odoo Server.
     """
 
     __logger = _getChildLogger(_logger, 'connector')
@@ -78,8 +77,8 @@ class XmlRPCConnector(Connector):
     def __init__(self, hostname, port=8069):
         """
         Initialize by specifying the hostname and the port.
-        :param hostname: The hostname of the computer holding the instance of OpenERP.
-        :param port: The port used by the OpenERP instance for XMLRPC (default to 8069).
+        :param hostname: The hostname of the computer holding the instance of .
+        :param port: The port used by the Odoo instance for XMLRPC (default to 8069).
         """
         self.url = 'http://%s:%d/xmlrpc' % (hostname, port)
 
@@ -113,11 +112,10 @@ def json_rpc(url, fct_name, params):
         "params": params,
         "id": random.randint(0, 1000000000),
     }
-    req = Request(url=url, data=json.dumps(data), headers={
+    result_req = requests.post(url, data=json.dumps(data), headers={
         "Content-Type":"application/json",
     })
-    result = urlopen(req)
-    result = json.load(result)
+    result = result_req.json()
     if result.get("error", None):
         raise JsonRPCException(result["error"])
     return result["result"]
@@ -133,8 +131,8 @@ class JsonRPCConnector(Connector):
     def __init__(self, hostname, port=8069):
         """
         Initialize by specifying the hostname and the port.
-        :param hostname: The hostname of the computer holding the instance of OpenERP.
-        :param port: The port used by the OpenERP instance for JsonRPC (default to 8069).
+        :param hostname: The hostname of the computer holding the instance of Odoo.
+        :param port: The port used by the Odoo instance for JsonRPC (default to 8069).
         """
         self.url = 'http://%s:%d/jsonrpc' % (hostname, port)
 
@@ -152,8 +150,8 @@ class JsonRPCSConnector(Connector):
     def __init__(self, hostname, port=8069):
         """
         Initialize by specifying the hostname and the port.
-        :param hostname: The hostname of the computer holding the instance of OpenERP.
-        :param port: The port used by the OpenERP instance for JsonRPC (default to 8069).
+        :param hostname: The hostname of the computer holding the instance of Odoo.
+        :param port: The port used by the Odoo instance for JsonRPC (default to 8069).
         """
         self.url = 'https://%s:%d/jsonrpc' % (hostname, port)
 
@@ -190,7 +188,7 @@ class Service(object):
 
 class Connection(object):
     """
-    A class to represent a connection with authentication to an OpenERP Server.
+    A class to represent a connection with authentication to an Odoo Server.
     It also provides utility methods to interact with the server more easily.
     """
     __logger = _getChildLogger(_logger, 'connection')
@@ -261,7 +259,7 @@ class Connection(object):
     
     def get_model(self, model_name):
         """
-        Returns a Model instance to allow easy remote manipulation of an OpenERP model.
+        Returns a Model instance to allow easy remote manipulation of an Odoo model.
 
         :param model_name: The name of the model.
         """
@@ -279,13 +277,13 @@ class Connection(object):
 
 class AuthenticationError(Exception):
     """
-    An error thrown when an authentication to an OpenERP server failed.
+    An error thrown when an authentication to an Odoo server failed.
     """
     pass
 
 class Model(object):
     """
-    Useful class to dialog with one of the models provided by an OpenERP server.
+    Useful class to dialog with one of the models provided by an Odoo server.
     An instance of this class depends on a Connection instance with valid authentication information.
     """
 
@@ -300,7 +298,7 @@ class Model(object):
 
     def __getattr__(self, method):
         """
-        Provides proxy methods that will forward calls to the model on the remote OpenERP server.
+        Provides proxy methods that will forward calls to the model on the remote Odoo server.
 
         :param method: The method for the linked model (search, read, write, unlink, create, ...)
         """
@@ -322,7 +320,12 @@ class Model(object):
                     index = {}
                     for r in result:
                         index[r['id']] = r
-                    result = [index[x] for x in args[0] if x in index]
+                    if isinstance(args[0], list):
+                        result = [index[x] for x in args[0] if x in index]
+                    elif args[0] in index:
+                        result = index[args[0]]
+                    else:
+                        result = False
             self.__logger.debug('result: %r', result)
             return result
         return proxy
@@ -339,9 +342,9 @@ class Model(object):
         :param context: The context.
         :return: A list of dictionaries containing all the specified fields.
         """
-        record_ids = self.search(domain or [], offset, limit or False, order or False, context or {})
+        record_ids = self.search(domain or [], offset, limit or False, order or False, context=context or {})
         if not record_ids: return []
-        records = self.read(record_ids, fields or [], context or {})
+        records = self.read(record_ids, fields or [], context=context or {})
         return records
 
 def get_connector(hostname=None, protocol="xmlrpc", port="auto"):
@@ -368,7 +371,7 @@ def get_connector(hostname=None, protocol="xmlrpc", port="auto"):
 def get_connection(hostname=None, protocol="xmlrpc", port='auto', database=None,
                  login=None, password=None, user_id=None):
     """
-    A shortcut method to easily create a connection to a remote OpenERP server.
+    A shortcut method to easily create a connection to a remote Odoo server.
 
     :param hostname: The hostname to the remote server.
     :param protocol: The name of the protocol, must be "xmlrpc", "xmlrpcs", "jsonrpc" or "jsonrpcs".
