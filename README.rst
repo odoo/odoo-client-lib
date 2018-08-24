@@ -13,7 +13,7 @@ Guide
 
 First install the library: ::
 
-    pip install install odoo-client-lib
+    pip install odoo-client-lib
 
 Now copy-paste the following script describing a simple interaction with an Odoo server: ::
 
