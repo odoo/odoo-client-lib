@@ -77,7 +77,7 @@ class XmlRPCConnector(Connector):
     def __init__(self, hostname, port=8069):
         """
         Initialize by specifying the hostname and the port.
-        :param hostname: The hostname of the computer holding the instance of .
+        :param hostname: The hostname of the computer holding the instance of Odoo.
         :param port: The port used by the Odoo instance for XMLRPC (default to 8069).
         """
         self.url = 'http://%s:%d/xmlrpc' % (hostname, port)
