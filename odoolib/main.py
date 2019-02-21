@@ -118,8 +118,7 @@ def json_rpc(url, fct_name, params):
     result = result_req.json()
     if result.get("error", None):
         raise JsonRPCException(result["error"])
-    result["result"] = result.get("result", None)
-    return result["result"]
+    return result.get("result", None)
 
 class JsonRPCConnector(Connector):
     """
