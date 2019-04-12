@@ -34,7 +34,7 @@ import os.path
 
 
 setup(name='odoo-client-lib',
-      version='1.2.0',
+      version='1.2.1',
       description='Odoo Client Library allows to easily interact with Odoo in Python.',
       author='Nicolas Vanhoren',
       author_email='',
