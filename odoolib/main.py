@@ -104,29 +104,17 @@ class JsonRPCException(Exception):
          self.error = error
     def __str__(self):
          return repr(self.error)
-
-def json_rpc(url, fct_name, params):
-    data = {
-        "jsonrpc": "2.0",
-        "method": fct_name,
-        "params": params,
-        "id": random.randint(0, 1000000000),
-    }
-    result_req = requests.post(url, data=json.dumps(data), headers={
-        "Content-Type":"application/json",
-    })
-    result = result_req.json()
-    if result.get("error", None):
-        raise JsonRPCException(result["error"])
-    return result.get("result", False)
+    
 
 class JsonRPCConnector(Connector):
     """
     A type of connector that uses the JsonRPC protocol.
     """
     PROTOCOL = 'jsonrpc'
+    session_reuse = False
     
     __logger = _getChildLogger(_logger, 'connector.jsonrpc')
+    _session = False
 
     def __init__(self, hostname, port=8069):
         """
@@ -137,15 +125,34 @@ class JsonRPCConnector(Connector):
         self.url = 'http://%s:%d/jsonrpc' % (hostname, port)
 
     def send(self, service_name, method, *args):
-        return json_rpc(self.url, "call", {"service": service_name, "method": method, "args": args})
+        return self._json_rpc(self.url, "call", {"service": service_name, "method": method, "args": args})
+    
+    def _json_rpc(self, url, fct_name, params):
+        data = {
+            "jsonrpc": "2.0",
+            "method": fct_name,
+            "params": params,
+            "id": random.randint(0, 1000000000),
+        }
+        if self.session_reuse and not self._session:
+            self._session = requests.Session()
+        post_cli = self._session.post if self.session_reuse else requests.post
 
-class JsonRPCSConnector(Connector):
+        result_req = post_cli(url, data=json.dumps(data), headers={
+            "Content-Type":"application/json",
+        })
+        result = result_req.json()
+        if result.get("error", None):
+            raise JsonRPCException(result["error"])
+        return result.get("result", False)
+
+
+class JsonRPCSConnector(JsonRPCConnector):
     """
     A type of connector that uses the JsonRPC protocol.
     """
     PROTOCOL = 'jsonrpcs'
-    
-    __logger = _getChildLogger(_logger, 'connector.jsonrpc')
+    session_reuse = True
 
     def __init__(self, hostname, port=8069):
         """
@@ -155,8 +162,6 @@ class JsonRPCSConnector(Connector):
         """
         self.url = 'https://%s:%d/jsonrpc' % (hostname, port)
 
-    def send(self, service_name, method, *args):
-        return json_rpc(self.url, "call", {"service": service_name, "method": method, "args": args})
 
 class Service(object):
     """
