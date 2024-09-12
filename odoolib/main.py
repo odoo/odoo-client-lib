@@ -114,7 +114,7 @@ class JsonRPCConnector(Connector):
     session_reuse = False
     
     __logger = _getChildLogger(_logger, 'connector.jsonrpc')
-    _session = False
+    _session = None
 
     def __init__(self, hostname, port=8069):
         """
