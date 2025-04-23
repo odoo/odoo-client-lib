@@ -1,0 +1,6 @@
+.r*
+*.py[cod]
+odoolib/__pycache__
+MANIFEST
+build
+dist
