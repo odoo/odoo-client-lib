@@ -1,8 +1,10 @@
 name: Python package
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
   build:
@@ -62,35 +64,3 @@ jobs:
         name: sdist
         path: ./sbuild/*.tar.gz
 
-  publish-to-pypi:
-    name: Publish Python 🐍 distribution 📦 to PyPI
-    needs: [ build, build-sdist ]
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/odoo-client-lib
-    # environment:
-    #   name: testpypi
-    #   url: https://test.pypi.org/p/odoo-client-lib
-    permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
-    steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v4
-      with:
-        path: dist/
-    - name: Display structure of downloaded files
-      run: ls -R dist/
-    - name: Move files from subdirectories
-      run: |
-        for subdirectory in dist/*/; do
-          dir_name=$(basename "$subdirectory")
-          mv "$subdirectory"* dist/
-          rm -r "$subdirectory"
-          echo "Moved files from '$dir_name' to 'dist/'"
-        done
-
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-    #   with:
-    #     repository-url: https://test.pypi.org/legacy/
