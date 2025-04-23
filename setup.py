@@ -34,7 +34,7 @@ import os.path
 
 
 setup(name='odoo-client-lib',
-      version='1.2.3',
+      version='1.2.4',
       description='Odoo Client Library allows to easily interact with Odoo in Python.',
       author='Nicolas Vanhoren',
       author_email='',
@@ -44,7 +44,7 @@ setup(name='odoo-client-lib',
           'requests',
       ],
       long_description="See the home page for any information: https://github.com/odoo/odoo-client-lib .",
-      keywords="openerp library com communication rpc xml-rpc net-rpc xmlrpc python client lib web service",
+      keywords="odoo library com communication rpc xml-rpc net-rpc xmlrpc python client lib web service",
       license="BSD",
       classifiers=[
           "License :: OSI Approved :: BSD License",
