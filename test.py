@@ -45,13 +45,14 @@ class TestSequenceFunctions(unittest.TestCase):
     
     def _conn(self, protocol):
         return odoolib.get_connection(hostname="localhost", protocol=protocol, 
-                                         database="test", login="admin", password="a")
+                                         database="test", login="admin", password="admin")
 
     def _get_protocols(self):
         return ["xmlrpc", "jsonrpc"]
         
     def _check_installed_language(self, connection, language):
-        res = connection.get_model("base.language.install").create({'lang': language, 'overwrite': False})
+        lang_ids = connection.get_model("res.lang").search(['&', ('code', '=', language), '|', ('active', '=', True), ('active', '=', False)])
+        res = connection.get_model("base.language.install").create({'lang_ids': [(6, 0, lang_ids)], 'overwrite': False})
         connection.get_model("base.language.install").lang_install(res)
         
     def test_simple(self):
