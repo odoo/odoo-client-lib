@@ -31,12 +31,13 @@
 
 """
 Some unit tests. They assume there is an Odoo server running on localhost, on the default port
-with a database named 'test' and a user 'admin' with password 'a'.
+with a database named 'test' and a user 'admin' with password 'admin'. Should create an API key for json2 tests.
 """
 
+import os
 import odoolib
 import unittest
-from requests.exceptions import SSLError
+from httpx import ConnectError
 
 class TestSequenceFunctions(unittest.TestCase):
 
@@ -44,11 +45,16 @@ class TestSequenceFunctions(unittest.TestCase):
         pass
     
     def _conn(self, protocol):
+        password = "admin"
+        if protocol == "json2":
+            password = os.environ.get("JSON2_API_KEY", "")
+            if not password:
+                raise ValueError("Environment variable 'JSON2_API_KEY' is not set.")
         return odoolib.get_connection(hostname="localhost", protocol=protocol, 
-                                         database="test", login="admin", password="admin")
+                                         database="test", login="admin", password=password)
 
     def _get_protocols(self):
-        return ["xmlrpc", "jsonrpc"]
+        return ["xmlrpc", "jsonrpc", "json2"]
         
     def _check_installed_language(self, connection, language):
         lang_ids = connection.get_model("res.lang").search(['&', ('code', '=', language), '|', ('active', '=', True), ('active', '=', False)])
@@ -105,7 +111,7 @@ class TestSequenceFunctions(unittest.TestCase):
         connection.get_model("res.users").read(1)
         
     def test_ensure_s_require_ssl(self):
-        self.assertRaises(SSLError, self._ssl_connection)
+        self.assertRaises(ConnectError, self._ssl_connection)
         
          
 if __name__ == '__main__':

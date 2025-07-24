@@ -29,25 +29,55 @@
 # 
 ##############################################################################
 
-from distutils.core import setup
-import os.path
+import httpx
+import logging
+import random
+import json
 
 
-setup(name='odoo-client-lib',
-      version='2.0.0',
-      description='Odoo Client Library allows to easily interact with Odoo in Python.',
-      author='Nicolas Vanhoren',
-      author_email='',
-      url='',
-      packages=["odoolib"],
-      install_requires=[
-          'httpx',
-      ],
-      long_description="See the home page for any information: https://github.com/odoo/odoo-client-lib .",
-      keywords="odoo library com communication rpc xml-rpc net-rpc xmlrpc python client lib web service",
-      license="BSD",
-      classifiers=[
-          "License :: OSI Approved :: BSD License",
-          "Programming Language :: Python",
-          ],
-     )
+def _getChildLogger(logger, subname):
+    return logging.getLogger(logger.name + "." + subname)
+
+def json_rpc(url, fct_name, params):
+    data = {
+        "jsonrpc": "2.0",
+        "method": fct_name,
+        "params": params,
+        "id": random.randint(0, 1000000000),
+    }
+    result_req = httpx.post(url, json=data, headers={
+        "Content-Type":"application/json",
+    })
+    result = result_req.json()
+    if result.get("error", None):
+        raise JsonRPCException(result["error"])
+    return result.get("result", False)
+
+
+class JsonRPCException(Exception):
+    def __init__(self, error):
+         self.error = error
+    def __str__(self):
+         return repr(self.error)
+
+
+class AuthenticationError(Exception):
+    """
+    An error thrown when an authentication to an Odoo server failed.
+    """
+    pass
+
+
+class RemoteModel(object):
+    """
+    Useful class to dialog with one of the models provided by an Odoo server.
+    An instance of this class depends on a Connection instance with valid authentication information.
+    """
+
+    def __init__(self, connection, model_name):
+        """
+        :param connection: A valid Connection instance with correct authentication information.
+        :param model_name: The name of the model.
+        """
+        self.connection = connection
+        self.model_name = model_name
