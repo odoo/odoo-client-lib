@@ -4,3 +4,4 @@ odoolib/__pycache__
 MANIFEST
 build
 dist
+odoo_client_lib.egg-info
