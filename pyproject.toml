@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "odoo-client-lib"
+version = "2.0.0"
+description='Odoo Client Library allows to easily interact with Odoo in Python.'
+authors=[
+  {name = 'Stephane Wirtel'},
+  {name = 'Nicolas Vanhoren'},
+  {name = 'Nicolas Seinlet', email = 'nse@odoo.com'},
+]
+readme = "README.rst"
+license = "BSD-3-Clause"
+license-files = ["licence.txt"]
+dependencies = [
+    "httpx",
+]
+requires-python = ">= 3.9"
+keywords = ["odoo", "library", "communication", "rpc", "xml-rpc", "net-rpc", "xmlrpc", "python", "client", "lib", "web", "service"]
