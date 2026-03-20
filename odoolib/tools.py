@@ -2,6 +2,8 @@ import httpx
 import logging
 import random
 
+DEFAULT_TIMEOUT = 60
+
 
 def _getChildLogger(logger, subname):
     return logging.getLogger(logger.name + "." + subname)
@@ -15,7 +17,7 @@ def json_rpc(url, fct_name, params, cookies={}):
     }
     result_req = httpx.post(url, json=data, cookies=cookies, headers={
         "Content-Type":"application/json",
-    })
+    }, timeout=DEFAULT_TIMEOUT)
     result = result_req.json()
     if result.get("error", None):
         raise JsonRPCException(result["error"])
